@@ -1,6 +1,9 @@
 import { useState } from "react";
 import Message from "./Message";
 import useChat from "../hooks/useChat";
+import { uploadFile } from "../services/uploadFile"; // Import file upload service
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "../styles/ChatWindow.css";
 
 interface ChatWindowProps {
@@ -11,8 +14,15 @@ export default function ChatWindow({ selectedModel }: ChatWindowProps) {
   const { messages, sendMessage } = useChat();
   const [input, setInput] = useState("");
 
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      await uploadFile(event.target.files[0]); // Call API to upload file
+    }
+  };
+
   return (
     <div className="chat-window">
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="messages">
         {messages.map((msg, index) => (
           <Message key={index} message={msg} />
@@ -34,12 +44,11 @@ export default function ChatWindow({ selectedModel }: ChatWindowProps) {
               setInput("");
             }}
           >
-
             🚀
           </button>
           <div className="file-upload">
             <label htmlFor="file-upload">📎</label>
-            <input id="file-upload" type="file" />
+            <input id="file-upload" type="file" onChange={handleFileChange} />
           </div>
         </div>
       </div>
